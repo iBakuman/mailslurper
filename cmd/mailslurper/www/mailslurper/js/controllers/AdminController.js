@@ -127,7 +127,8 @@
 		window.SettingsService.storeSettings(settings)
 			.then(function () {
 				if (settings.theme != currentTheme) {
-					window.location = "/admin";
+					var appURL = window.SettingsService.getAppURL();
+					window.location = appURL + "/admin";
 					return;
 				}
 
@@ -172,11 +173,7 @@
 	var adminPruneTemplate;
 	var adminSettings;
 
-	var serviceURL;
-	window.SettingsService.retrieveServiceSettings().then(function(url) {
-		serviceURL = window.SettingsService.getServiceURL(url);
-	});
-
+	var serviceURL = window.SettingsService.getServiceURL();
 	var pruneOptions = [];
 	var currentTheme = "";
 
