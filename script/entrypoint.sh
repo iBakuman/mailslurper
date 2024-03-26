@@ -5,7 +5,7 @@ if [ -n "${SERVICE_PUBLIC_URL}" ]; then
 fi
 
 if [ -n "${WWW_PUBLIC_URL}" ]; then
-  jq '.wwwPublicURL="${WWW_PUBLIC_URL}"' config.json > tmp.json && mv tmp.json config.json
+  jq '.wwwPublicURL="'${WWW_PUBLIC_URL}'"' config.json > tmp.json && mv tmp.json config.json
 fi
 
-#./mailslurper
+./mailslurper
