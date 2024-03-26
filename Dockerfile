@@ -14,33 +14,15 @@ RUN go build
 
 FROM alpine:3.15
 
-RUN apk add --no-cache ca-certificates \
- && echo -e '{\n\
-  "wwwAddress": "0.0.0.0",\n\
-  "wwwPort": 8080,\n\
-  "wwwPublicURL": "",\n\
-  "serviceAddress": "0.0.0.0",\n\
-  "servicePort": 8085,\n\
-  "servicePublicURL": "",\n\
-  "smtpAddress": "0.0.0.0",\n\
-  "smtpPort": 2500,\n\
-  "dbEngine": "SQLite",\n\
-  "dbHost": "",\n\
-  "dbPort": 0,\n\
-  "dbDatabase": "./mailslurper.db",\n\
-  "dbUserName": "",\n\
-  "dbPassword": "",\n\
-  "maxWorkers": 1000,\n\
-  "autoStartBrowser": false,\n\
-  "keyFile": "",\n\
-  "certFile": "",\n\
-  "adminKeyFile": "",\n\
-  "adminCertFile": ""\n\
-  }'\
-  >> config.json
+RUN apk add --no-cache ca-certificates jq
 
-COPY --from=builder /go/src/github.com/mailslurper/mailslurper/cmd/mailslurper/mailslurper mailslurper
+WORKDIR /app
 
-EXPOSE 8080 8085 2500
+COPY --from=builder /go/src/github.com/mailslurper/mailslurper/cmd/mailslurper/mailslurper .
+COPY ./config.json .
+COPY ./script/entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
-CMD ["./mailslurper"]
+EXPOSE 4436 4437 1025
+
+CMD ["./entrypoint.sh"]
