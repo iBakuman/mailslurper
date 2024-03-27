@@ -1,28 +1,20 @@
 FROM golang:1.21.8-alpine as builder
 
-LABEL maintainer="erguotou525@gmail.compute"
+RUN apk --no-cache add git libc-dev gcc && rm -rf /var/cache/api/* \
+    && go install github.com/mjibson/esc@latest
 
-RUN apk --no-cache add git libc-dev gcc
-RUN go install github.com/mjibson/esc@latest # TODO: Consider using native file embedding
+WORKDIR /src
+COPY . .
+ENV CGO_ENABLED=1
+RUN go get -d -v ./... && go generate && go build -o /app/mailslurper ./cmd/mailslurper
 
-COPY . /go/src/github.com/mailslurper/mailslurper
-WORKDIR /go/src/github.com/mailslurper/mailslurper/cmd/mailslurper
-
-RUN go get
-RUN go generate
-RUN go build
-
-FROM alpine:3.15
+FROM alpine:3.18
 
 RUN apk add --no-cache ca-certificates jq
-
 WORKDIR /app
-
-COPY --from=builder /go/src/github.com/mailslurper/mailslurper/cmd/mailslurper/mailslurper .
-COPY ./assets/* .
+COPY --from=builder /app/mailslurper .
+COPY ./config/* .
 COPY ./script/entrypoint.sh .
 RUN chmod +x entrypoint.sh
-
 EXPOSE 4436 4437 1025
-
 CMD ["./entrypoint.sh"]
