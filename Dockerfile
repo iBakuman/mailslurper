@@ -19,7 +19,7 @@ RUN apk add --no-cache ca-certificates jq
 WORKDIR /app
 
 COPY --from=builder /go/src/github.com/mailslurper/mailslurper/cmd/mailslurper/mailslurper .
-COPY ./config.json .
+COPY ./assets/* .
 COPY ./script/entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
